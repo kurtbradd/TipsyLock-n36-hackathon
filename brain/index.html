@@ -1,0 +1,11 @@
+<h1>HEY</h1>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io('http://3332ef7a.ngrok.com');
+  socket.on('connect', function(){
+    socket.on('data', function(data){
+    	console.log(data);
+    });
+    socket.on('disconnect', function(){});
+  });
+</script>
