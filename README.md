@@ -10,3 +10,5 @@ _Tipsy Lock, a drunk driving deterrent. Using the Muse (http://www.choosemuse.co
 - The Financial Post - http://business.financialpost.com/2014/10/22/they-came-they-hacked-and-they-conquered-wearable-techs
 - The Eyeopener - http://theeyeopener.com/2014/10/students-participate-in-wearable-tech-hackathon-at-google-canada
 - Nymi - http://www.getnymi.com/blog/our-first-two-public-hackathons-last-weekend-saw-awesome-applications-built-for-the-nymi-band
+
+This repository contains the section of the application that interfaces with the Muse. The application that interfaces with the Nymi is [here](https://github.com/valencra/TipsyLock-Demonstration-Version-.git).
