@@ -1,0 +1,297 @@
+//
+// Protocol Buffer file format for Muse data.
+//
+// Each message is prefixed by the size (4 bytes) and
+// the version(2 bytes).
+//
+// The message header version for this file is 2. This version number only changes with backward-incompatible changes.
+// The minor version for this file is 1.
+// Changelog:
+//   * v2.1: In HeadLocations enum, added MUSE_LEFT_AUX and MUSE_RIGHT_AUX.
+//
+// See the wiki for more info:
+// https://sites.google.com/a/interaxon.ca/muse-developer-site/data-files
+//
+
+option java_package = "com.ix.basis.muse";
+option java_outer_classname = "MuseDataSerializer";
+
+
+message MuseDataCollection {
+    repeated MuseData collection = 1;
+}
+
+
+message MuseData {
+    // The time that this event occurred. 
+    required double timestamp = 1;
+    
+    // This allows us to identify the extension data type.
+    enum Datatype {
+        EEG = 0;
+        QUANT = 1;
+        ACCEL = 2;
+        BATTERY = 3;
+        VERSION = 4;
+        CONFIG = 5;
+        ANNOTATION = 6;
+        HISTOGRAM = 7;
+        ALGVALUE = 8;
+        DSP = 9;
+    }
+    required Datatype datatype = 2;
+
+    // The config_id here maps to a MuseConfig message.
+    // This is the sensor configuration for this data.
+    // This id allows data from multiple devices to be recorded to a single file.
+    optional uint64 config_id = 3;
+
+    // Interaxon reserves ids 4-7 for future MuseData fields.
+
+    // Reserved for Muse extension messages.
+    // Values up to 15 only take 1 byte to store field number.
+    extensions 8 to 999; 
+    
+    // For 3rd party developers, uses 2 bytes for field number.
+    extensions 1000 to 2047; 
+}
+
+
+enum HeadLocations {
+    // All head locations http://www.bem.fi/book/13/13.htm#03
+    NZ   = 1;
+    FP1  = 2;
+    FPZ  = 3;
+    FP2  = 4;
+    AF7  = 5;
+    AF3  = 6;
+    AFZ  = 7;
+    AF4  = 8;
+    AF8  = 9;
+    F9   = 10;
+    F7   = 11;
+    F5   = 12;
+    F3   = 13;
+    F1   = 14;
+    FZ   = 15;
+    F2   = 16;
+    F4   = 17;
+    F6   = 18;
+    F8   = 19;
+    F10  = 20;
+    FT9  = 21;
+    FT7  = 22;
+    FC5  = 23;
+    FC3  = 24;
+    FC1  = 25;
+    FCZ  = 26;
+    FC2  = 27;
+    FC4  = 28;
+    FC6  = 29;
+    FT8  = 30;
+    FT10 = 31;
+    A1   = 32;
+    T9   = 33;
+    T7   = 34;
+    C5   = 35;
+    C3   = 36;
+    C1   = 37;
+    CZ   = 38;
+    C2   = 39;
+    C4   = 40;
+    C6   = 41;
+    T8   = 42;
+    T10  = 43;
+    A2   = 44;
+    TP9  = 45;
+    TP7  = 46;
+    CP5  = 47;
+    CP3  = 48;
+    CP1  = 49;
+    CPZ  = 50;
+    CP2  = 51;
+    CP4  = 52;
+    CP6  = 53;
+    TP8  = 54;
+    TP10 = 55;
+    P9   = 56;
+    P7   = 57;
+    P5   = 58;
+    P3   = 59;
+    P1   = 60;
+    PZ   = 61;
+    P2   = 62;
+    P4   = 63;
+    P6   = 64;
+    P8   = 65;
+    P10  = 66;
+    PO7  = 67;
+    PO3  = 68;
+    POZ  = 69;
+    PO4  = 70;
+    PO8  = 71;
+    O1   = 72;
+    OZ   = 73;
+    O2   = 74;
+    IZ   = 75;
+    AUX1 = 76;
+    AUX2 = 77;
+    AUX3 = 78;
+    AUX4 = 79;
+    MUSE_LEFT_AUX = 80;
+    MUSE_RIGHT_AUX = 81;
+}
+
+
+enum EEGUnits {
+  EEG_MICROVOLTS = 1;
+  EEG_MUSE1_RAW  = 2;
+}
+
+
+message EEG {
+    extend MuseData {
+        required EEG museData = 8;
+    }
+    repeated float values = 2;
+    optional float drl = 5;
+    optional float ref = 6;
+}
+
+
+// Possible quantization values are 1, 2, 4, 8, 16, 32, 64, 128
+message MuseQuantization {
+    extend MuseData {
+        required MuseQuantization museData = 9;
+    }
+    repeated uint32 values = 1;
+}
+
+
+enum AccelerometerUnits {
+    ACC_GFORCE = 1;
+    ACC_MUSE1_RAW = 2;
+}
+
+
+// Accelerometer values are stored as milli-G's
+message Accelerometer {
+    extend MuseData {
+        required Accelerometer museData = 10;
+    }
+    optional float acc1 = 1; // forward_back
+    optional float acc2 = 2; // up_down
+    optional float acc3 = 3; // left_right
+}
+
+
+// You can use this message to record application-level events.
+message Annotation {
+    extend MuseData {
+        required Annotation museData = 100;
+    }
+    // This is additional data for the event, can be in any format specified 
+    // by the Format enum. 
+    optional string event_data = 1;
+    enum Format {
+        PLAIN_STRING = 0;
+        JSON = 1;
+        OSC = 2;
+    }
+    // This specifies the string format of event_data.
+    optional Format event_data_format = 2 [default = PLAIN_STRING];
+    
+    // This can be used to classify events, for example "blink" or "error".
+    optional string event_type = 3;
+    
+    // This can be used to pair events together or give them unique IDs.
+    optional string event_id = 4;
+    
+    // This can be used to indicate this is a sub-event of another event.
+    optional string parent_id = 5;
+}
+
+
+message Battery {
+    extend MuseData {
+       required Battery museData = 101;
+    }
+    optional uint32 percent_remaining = 1;
+    optional uint32 battery_fuel_gauge_millivolts = 2;
+    optional uint32 battery_adc_millivolts = 3;
+    optional sint32 temperature_celsius = 4;
+}
+
+
+// This indicates the version of the Muse that was used with this recording.
+message MuseVersion {
+    extend MuseData {
+        required MuseVersion museData = 102;
+    }
+    optional string hardware_version = 1;
+    optional string firmware_headset_version = 2;
+    optional string firmware_type = 3;
+    optional string firmware_bootloader_version = 4;
+    optional string build_number = 5;
+    optional string protocol_version = 6;
+}
+
+
+// This indicates the configuration of a specific Muse specified by the config_id.
+message MuseConfig {
+    extend MuseData {
+        required MuseConfig museData = 103;
+    }
+
+    // Global configuration
+    optional string mac_addr = 1;
+    optional string serial_number = 2;
+    optional string preset = 3;
+
+    // Network protocol
+    optional bool compression_enabled = 100;
+
+    // EEG data
+    optional bool filters_enabled = 201;
+    optional uint32 notch_frequency_hz = 202;
+    optional uint32 eeg_sample_frequency_hz = 203;
+    optional uint32 eeg_output_frequency_hz = 204;
+    optional uint32 eeg_samples_bitwidth = 205;
+    optional uint32 eeg_channel_count = 206;
+    optional string eeg_channel_layout = 207; // raw string, converted to eeg_locations
+    optional uint32 eeg_downsample  = 208;
+    optional EEGUnits eeg_units = 209;
+    repeated HeadLocations eeg_locations = 210; // derived from eeg_channel_layout
+    optional float eeg_conversion_factor = 211;
+    optional float afe_gain = 212;  // Analog Front End Gain
+
+    // DRLREF data
+    optional bool drlref_data_enabled = 300;
+    optional float drlref_conversion_factor = 301;
+    optional uint32 drlref_sample_frequency_hz = 302;
+
+    // Accelerometer data
+    optional bool acc_data_enabled = 400;
+    optional AccelerometerUnits acc_units = 401;
+    optional float acc_conversion_factor = 402;
+    optional uint32 acc_sample_frequency_hz = 403;
+
+    // Battery data
+    optional bool battery_data_enabled = 500;
+    optional uint32 battery_percent_remaining = 501; // This is a bootstrap value since battery info is only emitted every few seconds
+    optional uint32 battery_millivolts = 502; // This is a bootstrap value since battery info is only emitted every few seconds
+
+    // Error data (hardware/firmware level errors)
+    optional bool error_data_enabled = 600;
+}
+
+
+message DSP {
+    extend MuseData {
+        required DSP museData = 200;
+    }
+    optional string type = 1;
+    repeated float float_array = 2;
+    repeated uint32 int_array = 3;
+}
+
