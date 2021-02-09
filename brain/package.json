@@ -9,7 +9,7 @@
     "express": "3.5.1",
     "jade": "*",
     "mongoose": "^3.8.17",
-    "node-osc": "^0.2.1",
+    "node-osc": "^0.3.1",
     "node-protobuf": "^1.2.1",
     "osc": "^1.0.3",
     "osc-min": "^0.1.0",
