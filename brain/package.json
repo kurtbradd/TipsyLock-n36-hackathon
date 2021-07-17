@@ -11,7 +11,7 @@
     "mongoose": "^3.8.17",
     "node-osc": "^0.2.1",
     "node-protobuf": "^1.2.1",
-    "osc": "^1.0.3",
+    "osc": "^2.4.2",
     "osc-min": "^0.1.0",
     "protobuf": "^0.11.0",
     "socket.io": "^1.1.0",
